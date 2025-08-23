@@ -51,16 +51,87 @@ Suivez ces étapes pour lancer le projet en local.
 
 ### Utilisateurs
 
-- `POST /api/users/register` : Créer un nouvel utilisateur.
-- `POST /api/users/login` : Connecter un utilisateur et recevoir un token JWT.
+-   `POST /api/users/register` : Créer un nouvel utilisateur.
+-   `POST /api/users/login` : Connecter un utilisateur et recevoir un token JWT.
 
 ### Articles (Protégé par authentification)
 
-- `GET /api/articles` : Obtenir tous les articles.
-- `POST /api/articles` : Créer un nouvel article.
-- `PUT /api/articles/:id` : Mettre à jour un article.
-- `DELETE /api/articles/:id` : Supprimer un article.
+-   `GET /api/articles` : Obtenir tous les articles.
+-   `POST /api/articles` : Créer un nouvel article.
+-   `PUT /api/articles/:id` : Mettre à jour un article.
+-   `DELETE /api/articles/:id` : Supprimer un article.
 
-### Commentaires (En cours)
+### Commentaires
 
-- Les endpoints pour la gestion des commentaires sont en cours de développement.
+-   `POST /api/comments` : Créer un nouveau commentaire.
+-   `GET /api/comments/article/:articleId` : Obtenir les commentaires d'un article.
+-   `PUT /api/comments/:id` : Mettre à jour un commentaire (nécessite authentification et être l'auteur).
+-   `DELETE /api/comments/:id` : Supprimer un commentaire (nécessite authentification et être l'auteur).
+
+## Fonctionnalités Implémentées
+
+*   **Authentification Utilisateur** : Inscription et connexion via JWT.
+*   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
+*   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
+
+## Prochaines Étapes / Fonctionnalités à Venir (Basé sur le Cahier des Charges)
+
+*   **Gestion du Profil Utilisateur** : Mise à jour du pseudo, de la bio, et de la photo de profil.
+*   **Fonctionnalités des Articles** :
+    *   Gestion des brouillons.
+    *   Filtrage des articles par popularité / date.
+    *   Système de "Like" pour les articles.
+    *   Compteur de vues pour les articles.
+*   **Profil Public** : Endpoint pour afficher le profil public d'un utilisateur avec sa biographie et la liste de ses articles publiés.
+*   **Déconnexion Sécurisée**.
+
+## Comment Tester avec Postman
+
+Pour interagir avec l'API, suivez ces étapes :
+
+1.  **Assurez-vous que le serveur backend est en cours d'exécution** (`npm run dev`).
+
+2.  **Obtenir un Token JWT (Connexion)** :
+    *   **Méthode** : `POST`
+    *   **URL** : `http://localhost:3000/api/users/login`
+    *   **Body (raw, JSON)** :
+        ```json
+        {
+            "email": "votre_email@example.com",
+            "password": "votre_mot_de_passe"
+        }
+        ```
+    *   La réponse contiendra votre token JWT. Copiez-le.
+
+3.  **Utiliser le Token pour les Requêtes Protégées** :
+    Pour toutes les requêtes nécessitant une authentification, ajoutez un en-tête `Authorization` :
+    *   **Header** : `Authorization`
+    *   **Value** : `Bearer VOTRE_TOKEN_JWT_COPIE_ICI` (remplacez par le token obtenu à l'étape 2).
+
+4.  **Exemples de Requêtes :**
+
+    *   **Créer un Commentaire (POST)** :
+        *   **URL** : `http://localhost:3000/api/comments`
+        *   **Headers** : `Authorization: Bearer VOTRE_TOKEN_JWT`
+        *   **Body (raw, JSON)** :
+            ```json
+            {
+                "content": "Ceci est un nouveau commentaire.",
+                "article": "ID_DE_L_ARTICLE"
+            }
+            ```
+        *   La réponse vous donnera l'ID du commentaire créé.
+
+    *   **Mettre à jour un Commentaire (PUT)** :
+        *   **URL** : `http://localhost:3000/api/comments/ID_DU_COMMENTAIRE` (remplacez par l'ID réel)
+        *   **Headers** : `Authorization: Bearer VOTRE_TOKEN_JWT`
+        *   **Body (raw, JSON)** :
+            ```json
+            {
+                "content": "Contenu du commentaire mis à jour."
+            }
+            ```
+
+    *   **Supprimer un Commentaire (DELETE)** :
+        *   **URL** : `http://localhost:3000/api/comments/ID_DU_COMMENTAIRE` (remplacez par l'ID réel)
+        *   **Headers** : `Authorization: Bearer VOTRE_TOKEN_JWT`
