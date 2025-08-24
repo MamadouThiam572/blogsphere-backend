@@ -16,6 +16,14 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    pseudo: {
+        type: String,
+        unique: true,
+        sparse: true // Permet d'avoir des valeurs nulles uniques
+    },
+    bio: {
+        type: String
     }
 });
 

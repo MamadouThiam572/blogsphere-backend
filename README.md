@@ -54,6 +54,7 @@ Suivez ces étapes pour lancer le projet en local.
 -   `POST /api/users/register` : Créer un nouvel utilisateur.
 -   `POST /api/users/login` : Connecter un utilisateur et recevoir un token JWT.
 -   `POST /api/users/logout` : Déconnecter un utilisateur (le client doit supprimer son token JWT).
+-   `PUT /api/users/profile` : Mettre à jour le profil de l'utilisateur connecté (pseudo, bio).
 
 ### Articles (Protégé par authentification)
 
@@ -73,6 +74,7 @@ Suivez ces étapes pour lancer le projet en local.
 
 *   **Authentification Utilisateur** : Inscription et connexion via JWT.
 *   **Déconnexion Sécurisée** : Permet aux utilisateurs de se déconnecter en invalidant leur token côté client.
+*   **Gestion du Profil Utilisateur** : Mise à jour du pseudo et de la bio de l'utilisateur connecté.
 *   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
 
@@ -104,7 +106,6 @@ Le backend est structuré pour gérer les requêtes API de manière organisée. 
 
 ## Prochaines Étapes / Fonctionnalités à Venir (Basé sur le Cahier des Charges)
 
-*   **Gestion du Profil Utilisateur** : Mise à jour du pseudo, de la bio, et de la photo de profil.
 *   **Fonctionnalités des Articles** :
     *   Gestion des brouillons.
     *   Filtrage des articles par popularité / date.
