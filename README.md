@@ -53,6 +53,7 @@ Suivez ces étapes pour lancer le projet en local.
 
 -   `POST /api/users/register` : Créer un nouvel utilisateur.
 -   `POST /api/users/login` : Connecter un utilisateur et recevoir un token JWT.
+-   `POST /api/users/logout` : Déconnecter un utilisateur (le client doit supprimer son token JWT).
 
 ### Articles (Protégé par authentification)
 
@@ -71,6 +72,7 @@ Suivez ces étapes pour lancer le projet en local.
 ## Fonctionnalités Implémentées
 
 *   **Authentification Utilisateur** : Inscription et connexion via JWT.
+*   **Déconnexion Sécurisée** : Permet aux utilisateurs de se déconnecter en invalidant leur token côté client.
 *   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
 
@@ -109,7 +111,6 @@ Le backend est structuré pour gérer les requêtes API de manière organisée. 
     *   Système de "Like" pour les articles.
     *   Compteur de vues pour les articles.
 *   **Profil Public** : Endpoint pour afficher le profil public d'un utilisateur avec sa biographie et la liste de ses articles publiés.
-*   **Déconnexion Sécurisée**.
 
 ## Comment Tester avec Postman
 
