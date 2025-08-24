@@ -1,82 +1,127 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Importer le modèle User
-const jwt = require('jsonwebtoken'); // Pour les tokens JWT
-const auth = require('../middleware/auth'); // Importer le middleware d'authentification
+const User = require('../models/User.js');
+const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth.js');
 
-// Route d'enregistrement d'un nouvel utilisateur
+// Fonction pour générer un token JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
+
+// @desc    Enregistrer un nouvel utilisateur
+// @route   POST /api/users/register
+// @access  Public
 router.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const user = new User({ username, email, password });
-        await user.save();
-        res.status(201).send({ message: 'Utilisateur enregistré avec succès.' });
-    } catch (error) {
-        res.status(400).send({ error: error.message });
+  const { username, email, password } = req.body;
+
+  try {
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({ message: 'Cet utilisateur existe déjà' });
     }
+
+    const user = await User.create({
+      username,
+      email,
+      password,
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Données utilisateur non valides' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur du serveur', error: error.message });
+  }
 });
 
-// Route de connexion d'un utilisateur
+// @desc    Authentifier l'utilisateur & obtenir le token
+// @route   POST /api/users/login
+// @access  Public
 router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
+  const { email, password } = req.body;
 
-        if (!user) {
-            return res.status(400).send({ error: 'Identifiants invalides.' });
-        }
+  try {
+    const user = await User.findOne({ email });
 
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(400).send({ error: 'Identifiants invalides.' });
-        }
+    if (user && (await user.comparePassword(password))) {
+      res.json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur du serveur', error: error.message });
+  }
+});
 
-        // Générer un token JWT
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.send({ user: { id: user._id, username: user.username, email: user.email }, token });
-    } catch (error) {
-        res.status(500).send({ error: error.message });
+// @desc    Récupérer le profil de l'utilisateur
+// @route   GET /api/users/profile
+// @access  Privé
+router.get('/profile', auth, async (req, res) => {
+    const user = await User.findById(req.user.id).select('-password');
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
 });
 
-// Route de déconnexion d'un utilisateur
-// Note: Avec les JWTs, la "déconnexion" côté serveur signifie principalement invalider le token côté client.
-// Il n'y a pas de session à détruire sur le serveur.
-router.post('/logout', auth, (req, res) => {
+// @desc    Mettre à jour le profil de l'utilisateur
+// @route   PUT /api/users/profile
+// @access  Privé
+router.put('/profile', auth, async (req, res) => {
     try {
-        // Le middleware 'auth' a déjà vérifié le token.
-        // Pour une déconnexion JWT, le client doit simplement supprimer son token.
-        // Nous envoyons une réponse de succès pour confirmer l'opération.
-        res.status(200).send({ message: 'Déconnexion réussie. Veuillez supprimer votre token côté client.' });
+        const user = await User.findById(req.user.id);
+
+        if (user) {
+            user.username = req.body.username || user.username;
+            user.bio = req.body.bio || user.bio;
+            if (req.body.profilePicture) {
+                user.profilePicture = req.body.profilePicture;
+            }
+
+            const updatedUser = await user.save();
+
+            res.json({
+                _id: updatedUser._id,
+                username: updatedUser.username,
+                email: updatedUser.email,
+                bio: updatedUser.bio,
+                profilePicture: updatedUser.profilePicture,
+                token: generateToken(updatedUser._id),
+            });
+        } else {
+            res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        res.status(400).json({ message: 'Erreur lors de la mise à jour', error: error.message });
     }
+});
+
+// @desc    Déconnexion de l'utilisateur
+// @route   POST /api/users/logout
+// @access  Privé
+router.post('/logout', auth, (req, res) => {
+    res.status(200).send({ message: 'Déconnexion réussie.' });
 });
 
 module.exports = router;
-
-// Route de mise à jour du profil utilisateur
-router.put('/profile', auth, async (req, res) => {
-    try {
-        const userId = req.user.userId; // ID de l'utilisateur depuis le token JWT
-        const { pseudo, bio } = req.body;
-
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).send({ error: 'Utilisateur non trouvé.' });
-        }
-
-        if (pseudo !== undefined) {
-            user.pseudo = pseudo;
-        }
-        if (bio !== undefined) {
-            user.bio = bio;
-        }
-
-        await user.save();
-        res.send({ message: 'Profil mis à jour avec succès.', user: { id: user._id, username: user.username, email: user.email, pseudo: user.pseudo, bio: user.bio } });
-    } catch (error) {
-        res.status(400).send({ error: error.message });
-    }
-});

@@ -19,6 +19,10 @@ const articleSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    brouillon: {
+        type: Boolean,
+        default: false
+    },
     views: {
         type: Number,
         default: 0

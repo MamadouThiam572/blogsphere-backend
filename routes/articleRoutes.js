@@ -37,7 +37,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, async (req, res) => {
     try {
         const { title, content, imageUrl } = req.body;
-        const author = req.user.userId; // L'ID de l'auteur vient du token JWT
+        const author = req.user.id; // L'ID de l'auteur vient du token JWT
 
         const article = new Article({
             title,
@@ -64,7 +64,7 @@ router.put('/:id', auth, async (req, res) => {
         }
 
         // Vérifier que l'utilisateur est bien l'auteur de l'article
-        if (article.author.toString() !== req.user.userId) {
+        if (article.author.toString() !== req.user.id) {
             return res.status(403).send({ error: 'Non autorisé à modifier cet article.' });
         }
 
@@ -90,7 +90,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         // Vérifier que l'utilisateur est bien l'auteur de l'article
-        if (article.author.toString() !== req.user.userId) {
+        if (article.author.toString() !== req.user.id) {
             return res.status(403).send({ error: 'Non autorisé à supprimer cet article.' });
         }
 
@@ -107,7 +107,7 @@ module.exports = router;
 router.post('/:id/like', auth, async (req, res) => {
     try {
         const articleId = req.params.id;
-        const userId = req.user.userId;
+        const userId = req.user.id;
 
         const article = await Article.findById(articleId);
         if (!article) {
@@ -133,7 +133,7 @@ router.post('/:id/like', auth, async (req, res) => {
 router.delete('/:id/like', auth, async (req, res) => {
     try {
         const articleId = req.params.id;
-        const userId = req.user.userId;
+        const userId = req.user.id;
 
         const result = await Like.deleteOne({ user: userId, article: articleId });
 
