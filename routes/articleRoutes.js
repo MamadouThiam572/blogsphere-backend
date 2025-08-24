@@ -20,6 +20,11 @@ router.get('/:id', async (req, res) => {
         if (!article) {
             return res.status(404).send({ error: 'Article non trouvé.' });
         }
+        
+        // Incrémenter le compteur de vues
+        article.views = (article.views || 0) + 1;
+        await article.save();
+
         res.send(article);
     } catch (error) {
         res.status(500).send({ error: error.message });

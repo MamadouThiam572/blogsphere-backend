@@ -77,6 +77,7 @@ Suivez ces étapes pour lancer le projet en local.
 *   **Gestion du Profil Utilisateur** : Mise à jour du pseudo et de la bio de l'utilisateur connecté.
 *   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
+*   **Compteur de Vues pour les Articles** : Incrémente le nombre de vues chaque fois qu'un article est consulté.
 
 ## Architecture du Backend (Flux des Requêtes)
 
@@ -110,7 +111,6 @@ Le backend est structuré pour gérer les requêtes API de manière organisée. 
     *   Gestion des brouillons.
     *   Filtrage des articles par popularité / date.
     *   Système de "Like" pour les articles.
-    *   Compteur de vues pour les articles.
 *   **Profil Public** : Endpoint pour afficher le profil public d'un utilisateur avec sa biographie et la liste de ses articles publiés.
 
 ## Comment Tester avec Postman
