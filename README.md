@@ -64,6 +64,7 @@ Suivez ces étapes pour lancer le projet en local.
 -   `DELETE /api/articles/:id` : Supprimer un article.
 -   `POST /api/articles/:id/like` : Aimer un article (nécessite authentification).
 -   `DELETE /api/articles/:id/like` : Désaimer un article (nécessite authentification).
+-   `POST /api/articles/upload-image` : Télécharger une image pour un article (nécessite authentification).
 
 ### Commentaires
 
@@ -81,6 +82,43 @@ Suivez ces étapes pour lancer le projet en local.
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
 *   **Compteur de Vues pour les Articles** : Incrémente le nombre de vues chaque fois qu'un article est consulté.
 *   **Système de "Like" pour les Articles** : Permet aux utilisateurs d'aimer et de "désaimer" les articles.
+
+## Architecture du Backend (Flux des Requêtes)
+
+Le backend est structuré pour gérer les requêtes API de manière organisée. Voici comment une requête typique est traitée :
+
+1.  **Client (Frontend/Postman)** : Envoie une requête HTTP (GET, POST, PUT, DELETE) à une URL spécifique de l'API (ex: `http://localhost:3000/api/articles`).
+
+2.  **`index.js` (Point d'entrée)** : C'est le fichier principal qui initialise l'application Express. Il écoute les requêtes entrantes et les dirige vers les routeurs appropriés. It handles database connection to MongoDB.
+
+3.  **`routes/` (Gestion des Routes)** :
+    *   Each file in this folder (e.g., `userRoutes.js`, `articleRoutes.js`, `commentRoutes.js`) defines the different URLs (endpoints) and associated HTTP methods (GET, POST, etc.).
+    *   These routes are responsible for the business logic specific to each resource (users, articles, comments).
+
+4.  **`middleware/auth.js` (Authentication)** :
+    *   Some routes require authentication (e.g., creating an article, modifying a comment).
+    *   The `auth.js` middleware intercepts the request, verifies the presence and validity of the JWT token provided by the client.
+    *   If the token is valid, it adds user information (like their ID) to the request (`req.user`) and passes control to the next route function. Otherwise, it returns an authentication error.
+
+5.  **`models/` (Data Models)** :
+    *   Each file in this folder (e.g., `User.js`, `Article.js`, `Comment.js`) defines the structure (schema) of the data for a specific resource in the MongoDB database, using Mongoose.
+    *   These models provide methods to interact with the database (create, read, update, delete documents).
+
+6.  **Database (MongoDB)** :
+    *   Models interact with MongoDB to store and retrieve data.
+
+7.  **Response to Client** : Once the logic is processed and the database interaction is complete, the route sends an HTTP response (with the requested data or a success/error message) to the client.
+
+## Fonctionnalités Implémentées
+
+*   **Authentification Utilisateur** : Inscription et connexion via JWT.
+*   **Déconnexion Sécurisée** : Permet aux utilisateurs de se déconnecter en invalidant leur token côté client.
+*   **Gestion du Profil Utilisateur** : Mise à jour du pseudo et de la bio de l'utilisateur connecté.
+*   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
+*   **Compteur de Vues pour les Articles** : Incrémente le nombre de vues chaque fois qu'un article est consulté.
+*   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
+*   **Système de "Like" pour les Articles** : Permet aux utilisateurs d'aimer et de "désaimer" les articles.
+*   **Gestion des Images pour les Articles** : Permet le téléchargement d'images pour les articles via Cloudinary.
 
 ## Architecture du Backend (Flux des Requêtes)
 

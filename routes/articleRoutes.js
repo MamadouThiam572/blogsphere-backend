@@ -3,6 +3,7 @@ const router = express.Router();
 const Article = require('../models/Article'); // Importer le modèle Article
 const Like = require('../models/Like'); // Importer le modèle Like
 const auth = require('../middleware/auth'); // Importer le middleware d'authentification
+const upload = require('../middleware/uploadImage'); // Importer le middleware de téléchargement d'image
 
 // GET /api/articles - Obtenir tous les articles
 router.get('/', async (req, res) => {
@@ -35,13 +36,14 @@ router.get('/:id', async (req, res) => {
 // POST /api/articles - Créer un nouvel article (protégé par authentification)
 router.post('/', auth, async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, imageUrl } = req.body;
         const author = req.user.userId; // L'ID de l'auteur vient du token JWT
 
         const article = new Article({
             title,
             content,
-            author
+            author,
+            imageUrl
         });
 
         await article.save();
@@ -54,7 +56,7 @@ router.post('/', auth, async (req, res) => {
 // PUT /api/articles/:id - Mettre à jour un article (protégé par authentification)
 router.put('/:id', auth, async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, imageUrl } = req.body;
         const article = await Article.findById(req.params.id);
 
         if (!article) {
@@ -68,6 +70,9 @@ router.put('/:id', auth, async (req, res) => {
 
         article.title = title;
         article.content = content;
+        if (imageUrl !== undefined) {
+            article.imageUrl = imageUrl;
+        }
         await article.save();
         res.send(article);
     } catch (error) {
@@ -137,6 +142,18 @@ router.delete('/:id/like', auth, async (req, res) => {
         }
 
         res.status(200).send({ message: 'Like supprimé avec succès.' });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+// POST /api/articles/upload-image - Télécharger une image (protégé par authentification)
+router.post('/upload-image', auth, upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send({ error: 'Aucun fichier image fourni.' });
+        }
+        res.status(200).send({ imageUrl: req.file.path });
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
