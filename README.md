@@ -62,6 +62,8 @@ Suivez ces étapes pour lancer le projet en local.
 -   `POST /api/articles` : Créer un nouvel article.
 -   `PUT /api/articles/:id` : Mettre à jour un article.
 -   `DELETE /api/articles/:id` : Supprimer un article.
+-   `POST /api/articles/:id/like` : Aimer un article (nécessite authentification).
+-   `DELETE /api/articles/:id/like` : Désaimer un article (nécessite authentification).
 
 ### Commentaires
 
@@ -78,6 +80,7 @@ Suivez ces étapes pour lancer le projet en local.
 *   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
 *   **Compteur de Vues pour les Articles** : Incrémente le nombre de vues chaque fois qu'un article est consulté.
+*   **Système de "Like" pour les Articles** : Permet aux utilisateurs d'aimer et de "désaimer" les articles.
 
 ## Architecture du Backend (Flux des Requêtes)
 
@@ -85,32 +88,31 @@ Le backend est structuré pour gérer les requêtes API de manière organisée. 
 
 1.  **Client (Frontend/Postman)** : Envoie une requête HTTP (GET, POST, PUT, DELETE) à une URL spécifique de l'API (ex: `http://localhost:3000/api/articles`).
 
-2.  **`index.js` (Point d'entrée)** : C'est le fichier principal qui initialise l'application Express. Il écoute les requêtes entrantes et les dirige vers les routeurs appropriés. Il gère également la connexion à la base de données MongoDB.
+2.  **`index.js` (Point d'entrée)** : C'est le fichier principal qui initialise l'application Express. Il écoute les requêtes entrantes et les dirige vers les routeurs appropriés. It handles database connection to MongoDB.
 
 3.  **`routes/` (Gestion des Routes)** :
-    *   Chaque fichier dans ce dossier (ex: `userRoutes.js`, `articleRoutes.js`, `commentRoutes.js`) définit les différentes URL (endpoints) et les méthodes HTTP associées (GET, POST, etc.).
-    *   Ces routes sont responsables de la logique métier spécifique à chaque ressource (utilisateurs, articles, commentaires).
+    *   Each file in this folder (e.g., `userRoutes.js`, `articleRoutes.js`, `commentRoutes.js`) defines the different URLs (endpoints) and associated HTTP methods (GET, POST, etc.).
+    *   These routes are responsible for the business logic specific to each resource (users, articles, comments).
 
-4.  **`middleware/auth.js` (Authentification)** :
-    *   Certaines routes nécessitent une authentification (par exemple, créer un article, modifier un commentaire).
-    *   Le middleware `auth.js` intercepte la requête, vérifie la présence et la validité du token JWT fourni par le client.
-    *   Si le token est valide, il ajoute les informations de l'utilisateur (comme son ID) à la requête (`req.user`) et passe le contrôle à la fonction de route suivante. Sinon, il renvoie une erreur d'authentification.
+4.  **`middleware/auth.js` (Authentication)** :
+    *   Some routes require authentication (e.g., creating an article, modifying a comment).
+    *   The `auth.js` middleware intercepts the request, verifies the presence and validity of the JWT token provided by the client.
+    *   If the token is valid, it adds user information (like their ID) to the request (`req.user`) and passes control to the next route function. Otherwise, it returns an authentication error.
 
-5.  **`models/` (Modèles de Données)** :
-    *   Chaque fichier dans ce dossier (ex: `User.js`, `Article.js`, `Comment.js`) définit la structure (schéma) des données pour une ressource spécifique dans la base de données MongoDB, en utilisant Mongoose.
-    *   Ces modèles fournissent des méthodes pour interagir avec la base de données (créer, lire, mettre à jour, supprimer des documents).
+5.  **`models/` (Data Models)** :
+    *   Each file in this folder (e.g., `User.js`, `Article.js`, `Comment.js`) defines the structure (schema) of the data for a specific resource in the MongoDB database, using Mongoose.
+    *   These models provide methods to interact with the database (create, read, update, delete documents).
 
-6.  **Base de Données (MongoDB)** :
-    *   Les modèles interagissent avec MongoDB pour stocker et récupérer les données.
+6.  **Database (MongoDB)** :
+    *   Models interact with MongoDB to store and retrieve data.
 
-7.  **Réponse au Client** : Une fois la logique traitée et l'interaction avec la base de données terminée, la route envoie une réponse HTTP (avec les données demandées ou un message de succès/erreur) au client.
+7.  **Response to Client** : Once the logic is processed and the database interaction is complete, the route sends an HTTP response (with the requested data or a success/error message) to the client.
 
 ## Prochaines Étapes / Fonctionnalités à Venir (Basé sur le Cahier des Charges)
 
 *   **Fonctionnalités des Articles** :
     *   Gestion des brouillons.
     *   Filtrage des articles par popularité / date.
-    *   Système de "Like" pour les articles.
 *   **Profil Public** : Endpoint pour afficher le profil public d'un utilisateur avec sa biographie et la liste de ses articles publiés.
 
 ## Comment Tester avec Postman

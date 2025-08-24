@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article'); // Importer le modèle Article
+const Like = require('../models/Like'); // Importer le modèle Like
 const auth = require('../middleware/auth'); // Importer le middleware d'authentification
 
 // GET /api/articles - Obtenir tous les articles
@@ -90,6 +91,52 @@ router.delete('/:id', auth, async (req, res) => {
 
         await article.deleteOne();
         res.send({ message: 'Article supprimé avec succès.' });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+module.exports = router;
+
+// POST /api/articles/:id/like - Aimer un article (protégé par authentification)
+router.post('/:id/like', auth, async (req, res) => {
+    try {
+        const articleId = req.params.id;
+        const userId = req.user.userId;
+
+        const article = await Article.findById(articleId);
+        if (!article) {
+            return res.status(404).send({ error: 'Article non trouvé.' });
+        }
+
+        // Vérifier si l'utilisateur a déjà liké cet article
+        const existingLike = await Like.findOne({ user: userId, article: articleId });
+        if (existingLike) {
+            return res.status(409).send({ message: 'Article déjà liké par cet utilisateur.' });
+        }
+
+        const like = new Like({ user: userId, article: articleId });
+        await like.save();
+
+        res.status(201).send({ message: 'Article liké avec succès.' });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+// DELETE /api/articles/:id/like - Désaimer un article (protégé par authentification)
+router.delete('/:id/like', auth, async (req, res) => {
+    try {
+        const articleId = req.params.id;
+        const userId = req.user.userId;
+
+        const result = await Like.deleteOne({ user: userId, article: articleId });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ message: 'Like non trouvé ou déjà supprimé.' });
+        }
+
+        res.status(200).send({ message: 'Like supprimé avec succès.' });
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
