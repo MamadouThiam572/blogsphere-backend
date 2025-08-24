@@ -74,6 +74,32 @@ Suivez ces étapes pour lancer le projet en local.
 *   **Gestion des Articles** : Création, lecture, mise à jour et suppression d'articles (CRUD).
 *   **Gestion des Commentaires** : Création, lecture, mise à jour et suppression de commentaires.
 
+## Architecture du Backend (Flux des Requêtes)
+
+Le backend est structuré pour gérer les requêtes API de manière organisée. Voici comment une requête typique est traitée :
+
+1.  **Client (Frontend/Postman)** : Envoie une requête HTTP (GET, POST, PUT, DELETE) à une URL spécifique de l'API (ex: `http://localhost:3000/api/articles`).
+
+2.  **`index.js` (Point d'entrée)** : C'est le fichier principal qui initialise l'application Express. Il écoute les requêtes entrantes et les dirige vers les routeurs appropriés. Il gère également la connexion à la base de données MongoDB.
+
+3.  **`routes/` (Gestion des Routes)** :
+    *   Chaque fichier dans ce dossier (ex: `userRoutes.js`, `articleRoutes.js`, `commentRoutes.js`) définit les différentes URL (endpoints) et les méthodes HTTP associées (GET, POST, etc.).
+    *   Ces routes sont responsables de la logique métier spécifique à chaque ressource (utilisateurs, articles, commentaires).
+
+4.  **`middleware/auth.js` (Authentification)** :
+    *   Certaines routes nécessitent une authentification (par exemple, créer un article, modifier un commentaire).
+    *   Le middleware `auth.js` intercepte la requête, vérifie la présence et la validité du token JWT fourni par le client.
+    *   Si le token est valide, il ajoute les informations de l'utilisateur (comme son ID) à la requête (`req.user`) et passe le contrôle à la fonction de route suivante. Sinon, il renvoie une erreur d'authentification.
+
+5.  **`models/` (Modèles de Données)** :
+    *   Chaque fichier dans ce dossier (ex: `User.js`, `Article.js`, `Comment.js`) définit la structure (schéma) des données pour une ressource spécifique dans la base de données MongoDB, en utilisant Mongoose.
+    *   Ces modèles fournissent des méthodes pour interagir avec la base de données (créer, lire, mettre à jour, supprimer des documents).
+
+6.  **Base de Données (MongoDB)** :
+    *   Les modèles interagissent avec MongoDB pour stocker et récupérer les données.
+
+7.  **Réponse au Client** : Une fois la logique traitée et l'interaction avec la base de données terminée, la route envoie une réponse HTTP (avec les données demandées ou un message de succès/erreur) au client.
+
 ## Prochaines Étapes / Fonctionnalités à Venir (Basé sur le Cahier des Charges)
 
 *   **Gestion du Profil Utilisateur** : Mise à jour du pseudo, de la bio, et de la photo de profil.
