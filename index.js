@@ -7,6 +7,9 @@ console.log('MONGO_URI chargée :', process.env.MONGO_URI); // Ligne de débogag
 
 const app = express();
 const port = process.env.PORT || 3000; // Utilise le port du .env ou 3000 par défaut
+const connectDB = require("./config/db");
+connectDB();
+
 
 // Importer les fichiers de routes
 const userRoutes = require('./routes/userRoutes');
@@ -32,6 +35,30 @@ app.use('/api/comments', commentRoutes);
 app.get('/', (req, res) => {
     res.send('Le serveur BlogSphere fonctionne !');
 });
+// Route de test
+app.get("/ping", (req, res) => {
+  res.json({ message: "MongoDB fonctionne ✅" });
+});
+const User = require("./models/user"); // <-- assure-toi que le chemin est correct
+
+// Route pour créer un utilisateur test
+app.get("/create-user", async (req, res) => {
+  try {
+    const newUser = new User({
+      username: "testuser",
+      email: "test@example.com",
+      password: "password123",
+      pseudo: "testpseudo",
+      bio: "Je suis un utilisateur test"
+    });
+
+    await newUser.save();
+    res.json({ message: "Utilisateur créé avec succès ✅", user: newUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // On démarre le serveur
 app.listen(port, () => {
