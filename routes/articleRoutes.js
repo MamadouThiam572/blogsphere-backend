@@ -101,8 +101,6 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
-
 // POST /api/articles/:id/like - Aimer un article (protégé par authentification)
 router.post('/:id/like', auth, async (req, res) => {
     try {

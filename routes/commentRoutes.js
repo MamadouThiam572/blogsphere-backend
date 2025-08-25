@@ -7,7 +7,7 @@ const auth = require('../middleware/auth'); // Importer le middleware d'authenti
 router.post('/', auth, async (req, res) => {
     try {
         const { content, article } = req.body; // On attend le contenu et l'ID de l'article
-        const author = req.user.userId; // L'ID de l'auteur vient du token JWT via le middleware auth
+        const author = req.user.id; // L'ID de l'auteur vient du token JWT via le middleware auth
 
         const comment = new Comment({
             content,
@@ -49,7 +49,7 @@ router.put('/:id', auth, async (req, res) => {
         }
 
         // Vérifier que l'utilisateur est bien l'auteur du commentaire
-        if (comment.author.toString() !== req.user.userId) {
+        if (comment.author.toString() !== req.user.id) {
             return res.status(403).send({ error: 'Non autorisé à modifier ce commentaire.' });
         }
 
@@ -71,7 +71,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         // Vérifier que l'utilisateur est bien l'auteur du commentaire
-        if (comment.author.toString() !== req.user.userId) {
+        if (comment.author.toString() !== req.user.id) {
             return res.status(403).send({ error: 'Non autorisé à supprimer ce commentaire.' });
         }
 
