@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../components/Context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Login() {
   const { login } = useAuth();
@@ -35,6 +36,14 @@ function Login() {
         <button className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition">
           Login
         </button>
+        
+      
+          <p className="text-center mt-4 text-gray-600">
+            Pas encore de compte ?{" "}
+            <Link to="/register" className="text-blue-500 hover:underline">
+              S'inscrire
+            </Link>
+         </p>
       </form>
     </div>
   );
