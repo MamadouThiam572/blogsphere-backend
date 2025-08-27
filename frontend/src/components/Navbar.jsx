@@ -25,8 +25,16 @@ function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/login" className="hover:text-blue-500">Login</Link>
-            <Link to="/register" className="hover:text-blue-500">Register</Link>
+            <Link 
+              to="/login" 
+              className="text-gray-700 hover:text-blue-500 font-medium transition-colors">
+              Connexion
+            </Link>
+            <Link 
+              to="/register" 
+              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+              S'inscrire
+            </Link>
           </>
         )}
       </div>
